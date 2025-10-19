@@ -4,7 +4,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
-import { Shield, MapPin, AlertTriangle } from 'lucide-react';
+// import { Shield, MapPin, AlertTriangle } from 'lucide-react'; // Importaciones eliminadas
 import { mockLogin, saveCurrentUser } from '../utils/mockData';
 import { User } from '../types';
 
@@ -42,148 +42,111 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center">
-        {/* Left side - Branding */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="bg-primary p-3 rounded-xl">
-              <MapPin className="w-8 h-8 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-foreground">Asistente de Mantenimiento</h1>
-              <p className="text-muted-foreground">Sistema de Reportes Públicos</p>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-start gap-3 p-4 bg-card rounded-lg shadow-sm border border-border">
-              <AlertTriangle className="w-5 h-5 text-accent mt-1 flex-shrink-0" />
-              <div>
-                <h3 className="text-card-foreground">Reporta Problemas</h3>
-                <p className="text-muted-foreground">Notifica baches, luces apagadas, inundaciones y más</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 p-4 bg-card rounded-lg shadow-sm border border-border">
-              <MapPin className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-              <div>
-                <h3 className="text-card-foreground">Ubicación Precisa</h3>
-                <p className="text-muted-foreground">Marca la ubicación exacta en el mapa interactivo</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 p-4 bg-card rounded-lg shadow-sm border border-border">
-              <Shield className="w-5 h-5 text-accent mt-1 flex-shrink-0" />
-              <div>
-                <h3 className="text-card-foreground">Seguimiento en Tiempo Real</h3>
-                <p className="text-muted-foreground">Conoce el estado de tus reportes</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right side - Login Form */}
-        <Card className="shadow-xl">
-          <CardHeader>
-            <CardTitle>{isRegistering ? 'Crear Cuenta' : 'Iniciar Sesión'}</CardTitle>
-            <CardDescription>
-              {isRegistering 
-                ? 'Regístrate para comenzar a reportar problemas' 
-                : 'Accede a tu cuenta para gestionar reportes'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {isRegistering && (
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nombre completo</Label>
-                  <Input id="name" placeholder="Juan Pérez" />
-                </div>
-              )}
-
+      {/* Ajuste clave:
+        Cambiamos 'max-w-md' por 'sm:max-w-lg'
+        'w-full' -> para móviles
+        'sm:max-w-lg' -> para limitar el ancho en pantallas 'sm' (640px) y superiores
+      */}
+      <Card className="shadow-xl w-full sm:max-w-lg">
+        <CardHeader>
+          <CardTitle>{isRegistering ? 'Crear Cuenta' : 'Iniciar Sesión'}</CardTitle>
+          <CardDescription>
+            {isRegistering 
+              ? 'Regístrate para comenzar a reportar problemas' 
+              : 'Accede a tu cuenta para gestionar reportes'}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {isRegistering && (
               <div className="space-y-2">
-                <Label htmlFor="email">Correo electrónico</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="correo@ejemplo.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
+                <Label htmlFor="name">Nombre completo</Label>
+                <Input id="name" placeholder="Juan Pérez" />
               </div>
+            )}
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Contraseña</Label>
-                <Input 
-                  id="password" 
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+            <div className="space-y-2">
+              <Label htmlFor="email">Correo electrónico</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="correo@ejemplo.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Contraseña</Label>
+              <Input 
+                id="password" 
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <Button type="submit" className="w-full">
+              {isRegistering ? 'Registrarse' : 'Ingresar'}
+            </Button>
+          </form>
+
+          <div className="mt-4">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-200"></div>
               </div>
-
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              <Button type="submit" className="w-full">
-                {isRegistering ? 'Registrarse' : 'Ingresar'}
-              </Button>
-            </form>
-
-            <div className="mt-4">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-200"></div>
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-white px-2 text-slate-500">o</span>
-                </div>
-              </div>
-
-              <div className="mt-4 space-y-2">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => handleDemoLogin('citizen')}
-                >
-                  Demo como Ciudadano
-                </Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => handleDemoLogin('admin')}
-                >
-                  Demo como Administrador
-                </Button>
+              <div className="relative flex justify-center">
+                <span className="bg-white px-2 text-slate-500">o</span>
               </div>
             </div>
 
-            <div className="mt-4 text-center">
-              <button
-                type="button"
-                onClick={() => setIsRegistering(!isRegistering)}
-                className="text-primary hover:underline"
+            <div className="mt-4 space-y-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full"
+                onClick={() => handleDemoLogin('citizen')}
               >
-                {isRegistering ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate'}
-              </button>
+                Demo como Ciudadano
+              </Button>
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full"
+                onClick={() => handleDemoLogin('admin')}
+              >
+                Demo como Administrador
+              </Button>
             </div>
+          </div>
 
-            <div className="mt-4 p-3 bg-muted rounded-lg">
-              <p className="text-muted-foreground">
-                <strong>Demo:</strong> usa "password" como contraseña
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={() => setIsRegistering(!isRegistering)}
+              className="text-primary hover:underline"
+            >
+              {isRegistering ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate'}
+            </button>
+          </div>
+
+          <div className="mt-4 p-3 bg-muted rounded-lg">
+            <p className="text-muted-foreground">
+              <strong>Demo:</strong> usa "password" como contraseña
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
