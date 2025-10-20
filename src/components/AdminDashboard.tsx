@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { AlertCircle, CheckCircle2, Clock, LogOut, MapPin, Filter, BarChart3 } from 'lucide-react';
 import { User, Report, ReportStatus, ReportCategory, CATEGORY_LABELS, STATUS_LABELS } from '../types';
-import SimpleMap from './SimpleMap';
+import RealMap from './RealMap';
 import ReportDetailsDialog from './ReportDetailsDialog';
 import ThemeToggle from './ThemeToggle';
 
@@ -353,7 +353,7 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
               </CardHeader>
               <CardContent>
                 <div className="h-[600px] rounded-lg overflow-hidden">
-                  <SimpleMap 
+                  <RealMap 
                     reports={filteredReports} 
                     onReportClick={handleReportClick}
                   />

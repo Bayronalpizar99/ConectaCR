@@ -5,11 +5,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
 import { Plus, MapPin, List, LogOut, Filter } from 'lucide-react';
 import { User, Report, CATEGORY_LABELS, STATUS_LABELS, ReportCategory } from '../types';
-import SimpleMap from './SimpleMap';
+import RealMap from './RealMap';
 import CreateReportDialog from './CreateReportDialog';
 import ReportDetailsDialog from './ReportDetailsDialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import ThemeToggle from './ThemeToggle';
+import { useGeolocation } from '../hooks/useGeolocation';
 
 interface CitizenDashboardProps {
   user: User;
@@ -26,27 +27,22 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<ReportCategory | 'all'>('all');
 
+  const geolocation = useGeolocation();
+  const userLocation = geolocation.latitude && geolocation.longitude ? { lat: geolocation.latitude, lng: geolocation.longitude } : null;
+
   const myReports = reports.filter(r => r.userId === user.id);
-  
-  const filteredReports = categoryFilter === 'all' 
-    ? reports 
-    : reports.filter(r => r.category === categoryFilter);
+  const filteredReports = categoryFilter === 'all' ? reports : reports.filter(r => r.category === categoryFilter);
 
   const handleReportClick = (report: Report) => {
     setSelectedReport(report);
     setDetailsDialogOpen(true);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    });
-  };
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
       <header className="bg-card border-b border-border sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -76,34 +72,6 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardDescription>Mis Reportes</CardDescription>
-              <CardTitle>{myReports.length}</CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardDescription>Recibidos</CardDescription>
-              <CardTitle>{myReports.filter(r => r.status === 'recibido').length}</CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardDescription>En Progreso</CardDescription>
-              <CardTitle>{myReports.filter(r => r.status === 'en_progreso').length}</CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardDescription>Resueltos</CardDescription>
-              <CardTitle>{myReports.filter(r => r.status === 'resuelto').length}</CardTitle>
-            </CardHeader>
-          </Card>
-        </div>
-
         {/* Main Tabs */}
         <Tabs defaultValue="map" className="space-y-4">
           <div className="flex items-center justify-between">
@@ -121,11 +89,6 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
                 Todos los Reportes
               </TabsTrigger>
             </TabsList>
-
-            <Button onClick={() => setCreateDialogOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Nuevo Reporte
-            </Button>
           </div>
 
           <TabsContent value="map" className="space-y-4">
@@ -133,13 +96,13 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>Mapa de Incidencias</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-foreground">Mapa de Incidencias</CardTitle>
+                    <CardDescription className="text-muted-foreground">
                       Visualiza todos los reportes en el mapa. Haz clic en un marcador para ver detalles.
                     </CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Filter className="w-4 h-4 text-slate-600" />
+                    <Filter className="w-4 h-4 text-muted-foreground" />
                     <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value as ReportCategory | 'all')}>
                       <SelectTrigger className="w-[200px]">
                         <SelectValue />
@@ -158,23 +121,24 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
               </CardHeader>
               <CardContent>
                 <div className="h-[500px] rounded-lg overflow-hidden">
-                  <SimpleMap 
-                    reports={filteredReports} 
+                  <RealMap
+                    reports={filteredReports}
                     onReportClick={handleReportClick}
+                    userLocation={userLocation}
                   />
                 </div>
                 <div className="flex items-center gap-4 mt-4">
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-red-500 rounded-full"></div>
-                    <span className="text-slate-600">Recibido</span>
+                    <div className="w-4 h-4 bg-red-500 rounded-full" />
+                    <span className="text-muted-foreground">Recibido</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-orange-500 rounded-full"></div>
-                    <span className="text-slate-600">En Progreso</span>
+                    <div className="w-4 h-4 bg-orange-500 rounded-full" />
+                    <span className="text-muted-foreground">En Progreso</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-                    <span className="text-slate-600">Resuelto</span>
+                    <div className="w-4 h-4 bg-green-500 rounded-full" />
+                    <span className="text-muted-foreground">Resuelto</span>
                   </div>
                 </div>
               </CardContent>
@@ -184,15 +148,15 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
           <TabsContent value="my-reports" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Mis Reportes</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-foreground">Mis Reportes</CardTitle>
+                <CardDescription className="text-muted-foreground">
                   Seguimiento de todos los reportes que has creado
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {myReports.length === 0 ? (
                   <div className="text-center py-12">
-                    <p className="text-slate-600">No has creado ningún reporte aún</p>
+                    <p className="text-muted-foreground">No has creado ningún reporte aún</p>
                     <Button onClick={() => setCreateDialogOpen(true)} className="mt-4">
                       <Plus className="w-4 h-4 mr-2" />
                       Crear primer reporte
@@ -201,25 +165,25 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
                 ) : (
                   <div className="space-y-3">
                     {myReports.map((report) => (
-                      <div 
+                      <div
                         key={report.id}
-                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
+                        className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent cursor-pointer transition-colors"
                         onClick={() => handleReportClick(report)}
                       >
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-slate-900">{report.title}</h3>
-                            <Badge 
+                            <h3 className="text-foreground">{report.title}</h3>
+                            <Badge
                               variant={
-                                report.status === 'resuelto' ? 'default' : 
-                                report.status === 'en_progreso' ? 'secondary' : 
+                                report.status === 'resuelto' ? 'default' :
+                                report.status === 'en_progreso' ? 'secondary' :
                                 'destructive'
                               }
                             >
                               {STATUS_LABELS[report.status]}
                             </Badge>
                           </div>
-                          <div className="flex items-center gap-4 text-slate-600">
+                          <div className="flex items-center gap-4 text-muted-foreground">
                             <span>{CATEGORY_LABELS[report.category]}</span>
                             <span>•</span>
                             <span className="flex items-center gap-1">
@@ -243,13 +207,13 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>Todos los Reportes</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-foreground">Todos los Reportes</CardTitle>
+                    <CardDescription className="text-muted-foreground">
                       Visualiza todos los reportes de la comunidad
                     </CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Filter className="w-4 h-4 text-slate-600" />
+                    <Filter className="w-4 h-4 text-muted-foreground" />
                     <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value as ReportCategory | 'all')}>
                       <SelectTrigger className="w-[200px]">
                         <SelectValue />
@@ -269,25 +233,25 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
               <CardContent>
                 <div className="space-y-3">
                   {filteredReports.map((report) => (
-                    <div 
+                    <div
                       key={report.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
+                      className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent cursor-pointer transition-colors"
                       onClick={() => handleReportClick(report)}
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-slate-900">{report.title}</h3>
-                          <Badge 
+                          <h3 className="text-foreground">{report.title}</h3>
+                          <Badge
                             variant={
-                              report.status === 'resuelto' ? 'default' : 
-                              report.status === 'en_progreso' ? 'secondary' : 
+                              report.status === 'resuelto' ? 'default' :
+                              report.status === 'en_progreso' ? 'secondary' :
                               'destructive'
                             }
                           >
                             {STATUS_LABELS[report.status]}
                           </Badge>
                         </div>
-                        <div className="flex items-center gap-4 text-slate-600">
+                        <div className="flex items-center gap-4 text-muted-foreground">
                           <span>{CATEGORY_LABELS[report.category]}</span>
                           <span>•</span>
                           <span className="flex items-center gap-1">
@@ -307,18 +271,20 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
         </Tabs>
       </div>
 
-      {/* Dialogs */}
-      <CreateReportDialog 
-        open={createDialogOpen}
-        onOpenChange={setCreateDialogOpen}
-        onSubmit={onCreateReport}
-      />
+      {/* FAB centrado en la ventana */}
+      <button
+        type="button"
+        className="fab"
+        onClick={() => setCreateDialogOpen(true)}
+        aria-label="Nuevo Reporte"
+      >
+        <Plus className="w-5 h-5" />
+        <span>Nuevo Reporte</span>
+      </button>
 
-      <ReportDetailsDialog 
-        report={selectedReport}
-        open={detailsDialogOpen}
-        onOpenChange={setDetailsDialogOpen}
-      />
+      {/* Dialogs */}
+      <CreateReportDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} onSubmit={onCreateReport} />
+      <ReportDetailsDialog report={selectedReport} open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen} />
     </div>
   );
 }

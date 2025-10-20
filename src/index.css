@@ -125,7 +125,6 @@
   }
 
   html, :host {
-    -webkit-text-size-adjust: 100%;
     tab-size: 4;
     line-height: 1.5;
     font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
@@ -676,6 +675,8 @@
     height: calc(var(--spacing) * 2);
   }
 
+
+  
   .h-3 {
     height: calc(var(--spacing) * 3);
   }
@@ -2398,6 +2399,22 @@
 html {
   font-size: var(--font-size);
 }
+
+
+/* En tu archivo global CSS */
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* Para el mini mapa */
+.mini-map-container {
+  pointer-events: none;
+}
+
 
 @property --tw-translate-x {
   syntax: "*";

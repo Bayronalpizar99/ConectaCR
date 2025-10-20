@@ -33,7 +33,8 @@ export interface Report {
     lng: number;
     address: string;
   };
-  imageUrl?: string;
+  imageFile?: File;
+  imageDataUrl?: string;
   status: ReportStatus;
   createdAt: string;
   updatedAt: string;
