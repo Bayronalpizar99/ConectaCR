@@ -10,6 +10,7 @@ import { User, Report, ReportStatus, ReportCategory, CATEGORY_LABELS, STATUS_LAB
 import RealMap from './RealMap';
 import ReportDetailsDialog from './ReportDetailsDialog';
 import ThemeToggle from './ThemeToggle';
+import { useGeolocation } from '../hooks/useGeolocation';
 
 interface AdminDashboardProps {
   user: User;
@@ -24,6 +25,8 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<ReportCategory | 'all'>('all');
+  const geolocation = useGeolocation();
+  const userLocation = geolocation.latitude && geolocation.longitude ? { lat: geolocation.latitude, lng: geolocation.longitude } : null;
   const [statusFilter, setStatusFilter] = useState<ReportStatus | 'all'>('all');
 
   const filteredReports = reports.filter(report => {
@@ -356,8 +359,10 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
                   <RealMap 
                     reports={filteredReports} 
                     onReportClick={handleReportClick}
+                    interactive={true}
+                    userLocation={userLocation}
                   />
-                </div>
+                  </div>
                 <div className="flex items-center gap-4 mt-4">
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-red-500 rounded-full"></div>

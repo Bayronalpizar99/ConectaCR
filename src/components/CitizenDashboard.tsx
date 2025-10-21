@@ -121,12 +121,13 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
               </CardHeader>
               <CardContent>
                 <div className="h-[500px] rounded-lg overflow-hidden">
-                  <RealMap
-                    reports={filteredReports}
-                    onReportClick={handleReportClick}
-                    userLocation={userLocation}
-                  />
-                </div>
+                <RealMap
+                  reports={filteredReports}
+                  onReportClick={handleReportClick}
+                  userLocation={userLocation}
+                  interactive={true} 
+                />
+              </div>
                 <div className="flex items-center gap-4 mt-4">
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-red-500 rounded-full" />

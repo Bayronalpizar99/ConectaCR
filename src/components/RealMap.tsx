@@ -328,7 +328,7 @@ export default function RealMap({
  <div className={`relative z-0 [isolation:isolate] w-full h-full ${className ?? ''}`}>
       <div ref={mapContainerRef} className="w-full h-full rounded-lg overflow-hidden" />
       {interactive && variant === 'full' && (
-        <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-3 py-2 rounded-lg shadow-lg z-[1000] pointer-events-none">
+        <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-3 py-2 rounded-lg shadow-lg z-[1000] pointer-events-none">
           <p className="flex items-center gap-2">
             <MapPin className="w-4 h-4" />
             Haz clic en el mapa para seleccionar ubicación
