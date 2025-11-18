@@ -1,0 +1,299 @@
+@custom-variant dark (&:is([data-theme="dark"] *));
+
+
+
+:root[data-theme="light"],
+:root {
+  --font-size: 16px;
+  
+  /* Custom theme colors */
+  --text: #010509;
+  --background: #f1f2f4;
+  --primary: #33f08b;
+  --secondary: #d5d5d8;
+  --accent: #4fab80;
+  
+  /* Mapped to Tailwind/Shadcn variables */
+  --foreground: var(--text);
+  --card: #ffffff;
+  --card-foreground: var(--text);
+  --popover: #ffffff;
+  --popover-foreground: var(--text);
+  --primary-foreground: #010509;
+  --secondary-foreground: var(--text);
+  --muted: var(--secondary);
+  --muted-foreground: #5a5a5d;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.1);
+  --input: transparent;
+  --input-background: #ffffff;
+  --switch-background: #cbced4;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: var(--primary);
+  --chart-1: #33f08b;
+  --chart-2: #4fab80;
+  --chart-3: #2dd4bf;
+  --chart-4: #10b981;
+  --chart-5: #059669;
+  --radius: 0.625rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: var(--text);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: #010509;
+  --sidebar-accent: var(--secondary);
+  --sidebar-accent-foreground: var(--text);
+  --sidebar-border: rgba(0, 0, 0, 0.1);
+  --sidebar-ring: var(--primary);
+}
+
+:root[data-theme="dark"] {
+  /* Custom theme colors */
+  --text: #f6fafe;
+  --background: #0b0c0e;
+  --primary: #0fcc67;
+  --secondary: #27272a;
+  --accent: #54b085;
+  
+  /* Mapped to Tailwind/Shadcn variables */
+  --foreground: var(--text);
+  --card: #18181b;
+  --card-foreground: var(--text);
+  --popover: #18181b;
+  --popover-foreground: var(--text);
+  --primary-foreground: #010509;
+  --secondary-foreground: var(--text);
+  --muted: var(--secondary);
+  --muted-foreground: #a1a1aa;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.05);
+  --input-background: #18181b;
+  --switch-background: #3f3f46;
+  --ring: var(--primary);
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --chart-1: #0fcc67;
+  --chart-2: #54b085;
+  --chart-3: #2dd4bf;
+  --chart-4: #10b981;
+  --chart-5: #059669;
+  --sidebar: #18181b;
+  --sidebar-foreground: var(--text);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: #010509;
+  --sidebar-accent: var(--secondary);
+  --sidebar-accent-foreground: var(--text);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: var(--primary);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/**
+ * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    h1 {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h2 {
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h3 {
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h4 {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    p {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+
+    label {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    button {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    input {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+}
+
+/* Leaflet z-index adjustments to work with dialogs */
+.leaflet-pane {
+  z-index: 400 !important;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 400 !important;
+}
+
+.leaflet-control {
+  z-index: 400 !important;
+}
+
+.leaflet-popup {
+  z-index: 410 !important;
+}
+
+/* ==== FAB centrado inferior (sin Tailwind) ==== */
+.fab {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px)); /* respeta notch */
+  z-index: 40; /* Radix Overlay ~ z-50. Sube a 60 si quieres que quede por encima */
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 12px 20px;            /* tamaño cómodo */
+  border-radius: 9999px;         /* pill */
+  border: 1px solid var(--border);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  box-shadow: 0 5px 20px var(--text);
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    filter 200ms ease;
+  will-change: transform;
+}
+
+.fab:hover {
+  transform: translateX(-50%) scale(1.05);
+  box-shadow: 0 5px 28px var(--text);
+  filter: brightness(1.02);
+}
+
+.fab:active {
+  transform: translateX(-50%) scale(0.96);
+}
+
+.fab:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--ring),
+    0 0 0 4px var(--background);
+}
+
+/* Resplandor suave al hover (opcional) */
+.fab::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  background: radial-gradient(60% 60% at 50% 50%, hsl(var(--primary) / .35), transparent);
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 200ms ease, transform 200ms ease;
+  pointer-events: none;
+  z-index: -1;
+}
+.fab:hover::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Variante icon-only (redonda) */
+.fab--icon {
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* Menos animación si el usuario lo prefiere */
+@media (prefers-reduced-motion: reduce) {
+  .fab, .fab::after { transition: none !important; }
+}

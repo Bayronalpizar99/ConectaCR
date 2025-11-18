@@ -1,0 +1,12 @@
+# Dependencias
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Entornos de desarrollo
+.env
+.env.local
+dist/
