@@ -142,61 +142,56 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
-        <header className="bg-card border-b border-border sticky top-0 z-50">
-        {/* 1. Padding estándar cómodo */}
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            {/* LOGO SECTION */}
-            <div className="flex items-center gap-3">
-              <img
-                src={theme === 'light' ? logoLight : logoDark}
-                alt="ConectaCR Logo"
-                /* 2. Zoom visual sin afectar el layout */
-                className="h-10 w-auto object-contain transition-all duration-300 scale-[100] origin-left ml-4"
-              />
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <ThemeToggle theme={theme} onToggle={onToggleTheme} />
-              <DropdownMenu open={profileMenuOpen} onOpenChange={setProfileMenuOpen} modal={false}>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="relative"
-                    aria-label="Perfil"
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                  >
-                    <UserCircle className="h-[1.2rem] w-[1.2rem]" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent 
-                  align="end" 
-                  className="w-64"
+      {/* Header compacto con logo a la izquierda */}
+      <header className="bg-card border-b border-border sticky top-0 z-50">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-6">
+          <div className="flex items-center gap-5 h-16 overflow-hidden">
+            <img
+              src={theme === 'light' ? logoLight : logoDark}
+              alt="ConectaCR Logo"
+              className="h-10 w-auto max-w-[200px] object-contain"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+            <DropdownMenu open={profileMenuOpen} onOpenChange={setProfileMenuOpen} modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="relative"
+                  aria-label="Perfil"
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <DropdownMenuLabel>
-                    <p className="font-semibold">{user.name}</p>
-                    <p className="text-xs text-muted-foreground break-words">{user.email}</p>
-                    <p className="text-xs text-muted-foreground capitalize mt-1">Rol: {user.role}</p>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      onLogout();
-                    }}
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Cerrar sesión
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+                  <UserCircle className="h-[1.2rem] w-[1.2rem]" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                align="end" 
+                className="w-64"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                <DropdownMenuLabel>
+                  <p className="font-semibold">{user.name}</p>
+                  <p className="text-xs text-muted-foreground break-words">{user.email}</p>
+                  <p className="text-xs text-muted-foreground capitalize mt-1">Rol: {user.role}</p>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    onLogout();
+                  }}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Cerrar sesión
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>

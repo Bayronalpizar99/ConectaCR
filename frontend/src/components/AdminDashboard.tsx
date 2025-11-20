@@ -157,66 +157,56 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
   );
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
+      {/* Header compacto con logo a la izquierda */}
         <header className="bg-card border-b border-border sticky top-0 z-50">
-          {/* 1. Usamos py-3 para que la barra tenga la altura estándar correcta */}
-          <div className="container mx-auto px-4 py-3">
-            <div className="flex items-center justify-between">
-              {/* LOGO SECTION */}
-              <div className="flex items-center gap-3">
-                <img
-                  src={theme === 'light' ? logoLight : logoDark}
-                  alt="ConectaCR Logo"
-                  /* TRUCO:
-                    h-9: La imagen ocupa poco espacio físico (el navbar no crece).
-                    scale-[1.8]: Hacemos un ZOOM de 1.8x para que se vea GRANDE.
-                    origin-left: El zoom se hace desde la izquierda para no salirse de la pantalla.
-                    ml-2: Un pequeño margen para que no pegue con el borde al hacer zoom.
-                  */
-                  className="h-10 w-auto object-contain transition-all duration-300 scale-[100] origin-left ml-4"
-                />
-              </div>
-            
-            <div className="flex items-center gap-2">
-              <ThemeToggle theme={theme} onToggle={onToggleTheme} />
-              <DropdownMenu open={profileMenuOpen} onOpenChange={setProfileMenuOpen} modal={false}>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="relative"
-                    aria-label="Perfil"
-                    onMouseEnter={handleProfileMouseEnter}
-                    onMouseLeave={handleProfileMouseLeave}
-                  >
-                    <UserCircle className="h-[1.2rem] w-[1.2rem]" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent 
-                  align="end" 
-                  className="w-64"
+          <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 h-12 overflow-hidden">
+              <img
+                src={theme === 'light' ? logoLight : logoDark}
+                alt="ConectaCR Logo"
+                className="h-10 w-auto max-w-[200px] object-contain"
+              />
+            </div>
+
+          <div className="flex items-center gap-2">
+            <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+            <DropdownMenu open={profileMenuOpen} onOpenChange={setProfileMenuOpen} modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="relative"
+                  aria-label="Perfil"
                   onMouseEnter={handleProfileMouseEnter}
                   onMouseLeave={handleProfileMouseLeave}
                 >
-                  <DropdownMenuLabel>
-                    <p className="font-semibold">{user.name}</p>
-                    <p className="text-xs text-muted-foreground break-words">{user.email}</p>
-                    <p className="text-xs text-muted-foreground capitalize mt-1">Rol: {user.role}</p>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      onLogout();
-                    }}
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Cerrar sesión
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+                  <UserCircle className="h-[1.2rem] w-[1.2rem]" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-64"
+                onMouseEnter={handleProfileMouseEnter}
+                onMouseLeave={handleProfileMouseLeave}
+              >
+                <DropdownMenuLabel>
+                  <p className="font-semibold">{user.name}</p>
+                  <p className="text-xs text-muted-foreground break-words">{user.email}</p>
+                  <p className="text-xs text-muted-foreground capitalize mt-1">Rol: {user.role}</p>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    onLogout();
+                  }}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Cerrar sesión
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
