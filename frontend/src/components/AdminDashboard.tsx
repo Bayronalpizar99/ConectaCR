@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -41,16 +41,18 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
   const hoverTimeoutRef = useRef<number | null>(null);
 
 
-  const filteredReports = reports.filter(report => {
-    if (categoryFilter !== 'all' && report.category !== categoryFilter) return false;
-    if (statusFilter !== 'all' && report.status !== statusFilter) return false;
-    return true;
-  });
+  const filteredReports = useMemo(() => {
+    return reports.filter(report => {
+      if (categoryFilter !== 'all' && report.category !== categoryFilter) return false;
+      if (statusFilter !== 'all' && report.status !== statusFilter) return false;
+      return true;
+    });
+  }, [reports, categoryFilter, statusFilter]);
 
-  const handleReportClick = (report: Report) => {
+  const handleReportClick = useCallback((report: Report) => {
     setSelectedReport(report);
     setDetailsDialogOpen(true);
-  };
+  }, []);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('es-ES', {
@@ -85,6 +87,70 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
       setProfileMenuOpen(false);
     }, 200);
   };
+
+  const mapTabContent = useMemo(
+    () => (
+      <TabsContent
+        value="map"
+        className="space-y-4"
+        forceMount
+        style={{ display: activeTab === 'map' ? 'block' : 'none' }}
+      >
+        <Card style={{ display: activeTab === 'map' ? 'block' : 'none' }}>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Mapa de Incidencias</CardTitle>
+                <CardDescription>Visualización geográfica de todos los reportes</CardDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-slate-600" />
+                <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value as ReportCategory | 'all')}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas las categorías</SelectItem>
+                    {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
+                      <SelectItem key={key} value={key}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[600px] rounded-lg overflow-hidden">
+              <RealMap
+                reports={filteredReports}
+                onReportClick={handleReportClick}
+                interactive={true}
+                userLocation={userLocation}
+                isVisible={activeTab === 'map'}
+              />
+            </div>
+            <div className="flex items-center gap-4 mt-4">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+                <span className="text-slate-600">Recibido ({recibidos})</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-orange-500 rounded-full"></div>
+                <span className="text-slate-600">En Progreso ({enProgreso})</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+                <span className="text-slate-600">Resuelto ({resueltos})</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </TabsContent>
+    ),
+    [activeTab, categoryFilter, filteredReports, handleReportClick, userLocation, recibidos, enProgreso, resueltos],
+  );
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -385,66 +451,7 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
             </Card>
           </TabsContent>
 
-          <TabsContent
-            value="map"
-            className="space-y-4"
-            forceMount
-            style={{ display: activeTab === 'map' ? 'block' : 'none' }}
-          >
-            <Card style={{ display: activeTab === 'map' ? 'block' : 'none' }}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Mapa de Incidencias</CardTitle>
-                    <CardDescription>
-                      Visualización geográfica de todos los reportes
-                    </CardDescription>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Filter className="w-4 h-4 text-slate-600" />
-                    <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value as ReportCategory | 'all')}>
-                      <SelectTrigger className="w-[200px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Todas las categorías</SelectItem>
-                        {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
-                          <SelectItem key={key} value={key}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[600px] rounded-lg overflow-hidden">
-                  <RealMap 
-                    reports={filteredReports} 
-                    onReportClick={handleReportClick}
-                    interactive={true}
-                    userLocation={userLocation}
-                    isVisible={activeTab === 'map'}
-                  />
-                  </div>
-                <div className="flex items-center gap-4 mt-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-red-500 rounded-full"></div>
-                    <span className="text-slate-600">Recibido ({recibidos})</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-orange-500 rounded-full"></div>
-                    <span className="text-slate-600">En Progreso ({enProgreso})</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-                    <span className="text-slate-600">Resuelto ({resueltos})</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+          {mapTabContent}
 
           <TabsContent value="stats" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

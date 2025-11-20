@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -38,13 +38,18 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
   const geolocation = useGeolocation();
   const userLocation = geolocation.latitude && geolocation.longitude ? { lat: geolocation.latitude, lng: geolocation.longitude } : null;
 
-  const myReports = reports.filter(r => r.userId === user.id);
-  const filteredReports = categoryFilter === 'all' ? reports : reports.filter(r => r.category === categoryFilter);
+  const filteredReports = useMemo(() => {
+    return categoryFilter === 'all' ? reports : reports.filter(r => r.category === categoryFilter);
+  }, [reports, categoryFilter]);
 
-  const handleReportClick = (report: Report) => {
+  const myReports = useMemo(() => {
+    return reports.filter(r => r.userId === user.id);
+  }, [reports, user.id]);
+
+  const handleReportClick = useCallback((report: Report) => {
     setSelectedReport(report);
     setDetailsDialogOpen(true);
-  };
+  }, []);
 
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const hoverTimeoutRef = useRef<number | null>(null);
@@ -61,6 +66,72 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
       setProfileMenuOpen(false);
     }, 200);
   };
+
+  const mapSection = useMemo(
+    () => (
+      <TabsContent
+        value="map"
+        className="space-y-4"
+        forceMount
+        style={{ display: activeTab === 'map' ? 'block' : 'none' }}
+      >
+        <Card style={{ display: activeTab === 'map' ? 'block' : 'none' }}>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-foreground">Mapa de Incidencias</CardTitle>
+                <CardDescription className="text-muted-foreground">
+                  Visualiza todos los reportes en el mapa. Haz clic en un marcador para ver detalles.
+                </CardDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-muted-foreground" />
+                <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value as ReportCategory | 'all')}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas las categorías</SelectItem>
+                    {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
+                      <SelectItem key={key} value={key}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[500px] rounded-lg overflow-hidden">
+              <RealMap
+                reports={filteredReports}
+                onReportClick={handleReportClick}
+                userLocation={userLocation}
+                interactive={true}
+                isVisible={activeTab === 'map'}
+              />
+            </div>
+            <div className="flex items-center gap-4 mt-4">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-red-500 rounded-full" />
+                <span className="text-muted-foreground">Recibido</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-orange-500 rounded-full" />
+                <span className="text-muted-foreground">En Progreso</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-green-500 rounded-full" />
+                <span className="text-muted-foreground">Resuelto</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </TabsContent>
+    ),
+    [activeTab, categoryFilter, filteredReports, handleReportClick, userLocation],
+  );
 
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -150,66 +221,7 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
             </TabsList>
           </div>
 
-          <TabsContent
-            value="map"
-            className="space-y-4"
-            forceMount
-            style={{ display: activeTab === 'map' ? 'block' : 'none' }}
-          >
-            <Card style={{ display: activeTab === 'map' ? 'block' : 'none' }}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-foreground">Mapa de Incidencias</CardTitle>
-                    <CardDescription className="text-muted-foreground">
-                      Visualiza todos los reportes en el mapa. Haz clic en un marcador para ver detalles.
-                    </CardDescription>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Filter className="w-4 h-4 text-muted-foreground" />
-                    <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value as ReportCategory | 'all')}>
-                      <SelectTrigger className="w-[200px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Todas las categorías</SelectItem>
-                        {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
-                          <SelectItem key={key} value={key}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[500px] rounded-lg overflow-hidden">
-                  <RealMap
-                    reports={filteredReports}
-                    onReportClick={handleReportClick}
-                    userLocation={userLocation}
-                    interactive={true}
-                    isVisible={activeTab === 'map'}
-                  />
-                </div>
-                <div className="flex items-center gap-4 mt-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-red-500 rounded-full" />
-                    <span className="text-muted-foreground">Recibido</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-orange-500 rounded-full" />
-                    <span className="text-muted-foreground">En Progreso</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-green-500 rounded-full" />
-                    <span className="text-muted-foreground">Resuelto</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+          {mapSection}
 
           <TabsContent value="my-reports" className="space-y-4">
             <Card>
