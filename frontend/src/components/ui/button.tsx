@@ -34,25 +34,27 @@ const buttonVariants = cva(
   },
 );
 
-function Button({
-  className,
-  variant,
-  size,
-  asChild = false,
-  ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-  }) {
+// Cambio principal: Envolvemos el componente en React.forwardRef
+const Button = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentProps<"button"> &
+    VariantProps<typeof buttonVariants> & {
+      asChild?: boolean;
+    }
+>(({ className, variant, size, asChild = false, ...props }, ref) => {
   const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      ref={ref} // Pasamos la referencia aquí
       {...props}
     />
   );
-}
+});
+
+// Es buena práctica asignar un displayName al usar forwardRef
+Button.displayName = "Button";
 
 export { Button, buttonVariants };

@@ -153,17 +153,18 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
             </div>
             <div className="flex items-center gap-3">
               <ThemeToggle theme={theme} onToggle={onToggleTheme} />
-              <DropdownMenu open={profileMenuOpen} onOpenChange={setProfileMenuOpen}>
+              <DropdownMenu open={profileMenuOpen} onOpenChange={setProfileMenuOpen} modal={false}>
                 <DropdownMenuTrigger asChild>
-                  <button
-                    type="button"
-                    className="p-0 h-10 w-10 rounded-full border border-border hover:bg-muted inline-flex items-center justify-center bg-background text-foreground"
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="relative"
                     aria-label="Perfil"
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                   >
-                    <UserCircle className="w-8 h-8 text-primary" />
-                  </button>
+                    <UserCircle className="h-[1.2rem] w-[1.2rem] text-primary" />
+                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent 
                   align="end" 

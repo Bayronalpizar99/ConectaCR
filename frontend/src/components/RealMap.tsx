@@ -132,11 +132,11 @@ export default function RealMap({
       mapRef.current = map;
 
       // Forzar cálculo de tamaño correcto (muy importante en mini-mapa / diálogos)
-      requestAnimationFrame(() => map.invalidateSize());
+      requestAnimationFrame(() => map.invalidateSize({ animate: false }));
 
       // Recalcular cuando cambie el tamaño del contenedor
       if ('ResizeObserver' in window) {
-        resizeObsRef.current = new ResizeObserver(() => map.invalidateSize());
+        resizeObsRef.current = new ResizeObserver(() => map.invalidateSize({ animate: false }));
         resizeObsRef.current.observe(mapContainerRef.current);
       }
 
@@ -163,7 +163,7 @@ export default function RealMap({
     visibilityObsRef.current = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          requestAnimationFrame(() => mapRef.current?.invalidateSize());
+          requestAnimationFrame(() => mapRef.current?.invalidateSize({ animate: false }));
         }
       });
     });
@@ -179,7 +179,7 @@ export default function RealMap({
   // Invalidar tamaño cuando el contenedor vuelve a ser visible (p.ej. cambio de tab)
   useEffect(() => {
     if (isVisible && mapRef.current) {
-      requestAnimationFrame(() => mapRef.current?.invalidateSize());
+      requestAnimationFrame(() => mapRef.current?.invalidateSize({ animate: false }));
     }
   }, [isVisible]);
 
