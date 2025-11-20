@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { AlertCircle, CheckCircle2, Clock, LogOut, MapPin, Filter, BarChart3, UserCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, LogOut, Filter, BarChart3, UserCircle } from 'lucide-react';
 import { User, Report, ReportStatus, ReportCategory, CATEGORY_LABELS, STATUS_LABELS } from '../types';
 import RealMap from './RealMap';
 import ReportDetailsDialog from './ReportDetailsDialog';
@@ -19,6 +19,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+
+// Importación de logos
+import logoLight from '../assets/logo1.png';
+import logoDark from '../assets/logo2.png';
 
 interface AdminDashboardProps {
   user: User;
@@ -154,19 +158,26 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-card border-b border-border sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-primary p-2 rounded-lg">
-                <MapPin className="w-6 h-6 text-primary-foreground" />
+        <header className="bg-card border-b border-border sticky top-0 z-50">
+          {/* 1. Usamos py-3 para que la barra tenga la altura estándar correcta */}
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex items-center justify-between">
+              {/* LOGO SECTION */}
+              <div className="flex items-center gap-3">
+                <img
+                  src={theme === 'light' ? logoLight : logoDark}
+                  alt="ConectaCR Logo"
+                  /* TRUCO:
+                    h-9: La imagen ocupa poco espacio físico (el navbar no crece).
+                    scale-[1.8]: Hacemos un ZOOM de 1.8x para que se vea GRANDE.
+                    origin-left: El zoom se hace desde la izquierda para no salirse de la pantalla.
+                    ml-2: Un pequeño margen para que no pegue con el borde al hacer zoom.
+                  */
+                  className="h-10 w-auto object-contain transition-all duration-300 scale-[100] origin-left ml-4"
+                />
               </div>
-              <div>
-                <h1 className="text-foreground">Asistente de Mantenimiento</h1>
-                <p className="text-muted-foreground">Panel de Administración</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
+            
+            <div className="flex items-center gap-2">
               <ThemeToggle theme={theme} onToggle={onToggleTheme} />
               <DropdownMenu open={profileMenuOpen} onOpenChange={setProfileMenuOpen} modal={false}>
                 <DropdownMenuTrigger asChild>

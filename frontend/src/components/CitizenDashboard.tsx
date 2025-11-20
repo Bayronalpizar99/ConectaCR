@@ -20,6 +20,10 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 
+// Importación de logos
+import logoLight from '../assets/logo1.png';
+import logoDark from '../assets/logo2.png';
+
 interface CitizenDashboardProps {
   user: User;
   reports: Report[];
@@ -139,19 +143,21 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="bg-card border-b border-border sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+        <header className="bg-card border-b border-border sticky top-0 z-50">
+        {/* 1. Padding estándar cómodo */}
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
+            {/* LOGO SECTION */}
             <div className="flex items-center gap-3">
-              <div className="bg-primary p-2 rounded-lg">
-                <MapPin className="w-6 h-6 text-primary-foreground" />
-              </div>
-              <div>
-                <h1 className="text-foreground">Asistente de Mantenimiento</h1>
-                <p className="text-muted-foreground">Panel Ciudadano</p>
-              </div>
+              <img
+                src={theme === 'light' ? logoLight : logoDark}
+                alt="ConectaCR Logo"
+                /* 2. Zoom visual sin afectar el layout */
+                className="h-10 w-auto object-contain transition-all duration-300 scale-[100] origin-left ml-4"
+              />
             </div>
-            <div className="flex items-center gap-3">
+            
+            <div className="flex items-center gap-2">
               <ThemeToggle theme={theme} onToggle={onToggleTheme} />
               <DropdownMenu open={profileMenuOpen} onOpenChange={setProfileMenuOpen} modal={false}>
                 <DropdownMenuTrigger asChild>
