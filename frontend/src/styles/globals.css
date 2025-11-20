@@ -297,3 +297,24 @@ html {
 @media (prefers-reduced-motion: reduce) {
   .fab, .fab::after { transition: none !important; }
 }
+
+/* Logo Popover - Global Solution */
+.logo-popover {
+  height: 155px;
+  width: auto;
+  max-width: 200px;
+  object-fit: contain;
+  position: absolute;
+  top: -40px;
+  left: 1rem; /* Aligns with container padding */
+  z-index: 50;
+  transition: all 0.3s ease;
+}
+
+/* Ensure header allows overflow */
+header.navbar-overflow {
+  overflow: visible !important;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}

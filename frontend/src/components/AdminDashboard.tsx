@@ -158,15 +158,14 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
   return (
     <div className="min-h-screen bg-background">
       {/* Header compacto con logo a la izquierda */}
-        <header className="bg-card border-b border-border sticky top-0 z-50">
-          <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 h-12 overflow-hidden">
-              <img
-                src={theme === 'light' ? logoLight : logoDark}
-                alt="ConectaCR Logo"
-                className="h-10 w-auto max-w-[200px] object-contain"
-              />
-            </div>
+        <header className="bg-card border-b border-border sticky top-0 z-50 h-[96px] navbar-overflow">
+          <div className="container mx-auto px-4 h-full flex items-center justify-between gap-4 relative py-3">
+            <div className="w-[200px] h-full flex-shrink-0"></div> {/* Placeholder */}
+            <img
+              src={theme === 'light' ? logoLight : logoDark}
+              alt="ConectaCR Logo"
+              className="logo-popover"
+            />
 
           <div className="flex items-center gap-2">
             <ThemeToggle theme={theme} onToggle={onToggleTheme} />
