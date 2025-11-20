@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
-import { Plus, MapPin, List, LogOut, Filter } from 'lucide-react';
+import { Plus, MapPin, List, LogOut, Filter, UserCircle } from 'lucide-react';
 import { User, Report, CATEGORY_LABELS, STATUS_LABELS, ReportCategory } from '../types';
 import RealMap from './RealMap';
 import CreateReportDialog from './CreateReportDialog';
@@ -11,6 +11,14 @@ import ReportDetailsDialog from './ReportDetailsDialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import ThemeToggle from './ThemeToggle';
 import { useGeolocation } from '../hooks/useGeolocation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 
 interface CitizenDashboardProps {
   user: User;
@@ -26,7 +34,7 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<ReportCategory | 'all'>('all');
-
+  const [activeTab, setActiveTab] = useState<'map' | 'my-reports' | 'all-reports'>('map');
   const geolocation = useGeolocation();
   const userLocation = geolocation.latitude && geolocation.longitude ? { lat: geolocation.latitude, lng: geolocation.longitude } : null;
 
@@ -36,6 +44,22 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
   const handleReportClick = (report: Report) => {
     setSelectedReport(report);
     setDetailsDialogOpen(true);
+  };
+
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const hoverTimeoutRef = useRef<number | null>(null);
+
+  const handleMouseEnter = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    setProfileMenuOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    hoverTimeoutRef.current = window.setTimeout(() => {
+      setProfileMenuOpen(false);
+    }, 200);
   };
 
   const formatDate = (dateString: string) =>
@@ -57,14 +81,43 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="text-right">
-                <p className="text-foreground">{user.name}</p>
-                <p className="text-muted-foreground">{user.email}</p>
-              </div>
               <ThemeToggle theme={theme} onToggle={onToggleTheme} />
-              <Button variant="outline" size="icon" onClick={onLogout}>
-                <LogOut className="w-4 h-4" />
-              </Button>
+              <DropdownMenu open={profileMenuOpen} onOpenChange={setProfileMenuOpen}>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="p-0 h-10 w-10 rounded-full border border-border hover:bg-muted inline-flex items-center justify-center bg-background text-foreground"
+                    aria-label="Perfil"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <UserCircle className="w-8 h-8 text-primary" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  align="end" 
+                  className="w-64"
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <DropdownMenuLabel>
+                    <p className="font-semibold">{user.name}</p>
+                    <p className="text-xs text-muted-foreground break-words">{user.email}</p>
+                    <p className="text-xs text-muted-foreground capitalize mt-1">Rol: {user.role}</p>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-destructive focus:text-destructive"
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      onLogout();
+                    }}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Cerrar sesión
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
@@ -73,7 +126,13 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         {/* Main Tabs */}
-        <Tabs defaultValue="map" className="space-y-4">
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) =>
+            setActiveTab(value as 'map' | 'my-reports' | 'all-reports')
+          }
+          className="space-y-4"
+        >
           <div className="flex items-center justify-between">
             <TabsList>
               <TabsTrigger value="map" className="flex items-center gap-2">
@@ -91,8 +150,13 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
             </TabsList>
           </div>
 
-          <TabsContent value="map" className="space-y-4">
-            <Card>
+          <TabsContent
+            value="map"
+            className="space-y-4"
+            forceMount
+            style={{ display: activeTab === 'map' ? 'block' : 'none' }}
+          >
+            <Card style={{ display: activeTab === 'map' ? 'block' : 'none' }}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
@@ -121,13 +185,14 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
               </CardHeader>
               <CardContent>
                 <div className="h-[500px] rounded-lg overflow-hidden">
-                <RealMap
-                  reports={filteredReports}
-                  onReportClick={handleReportClick}
-                  userLocation={userLocation}
-                  interactive={true} 
-                />
-              </div>
+                  <RealMap
+                    reports={filteredReports}
+                    onReportClick={handleReportClick}
+                    userLocation={userLocation}
+                    interactive={true}
+                    isVisible={activeTab === 'map'}
+                  />
+                </div>
                 <div className="flex items-center gap-4 mt-4">
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-red-500 rounded-full" />

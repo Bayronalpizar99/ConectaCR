@@ -21,6 +21,8 @@ interface RealMapProps {
   variant?: 'full' | 'thumbnail';
   /** Permite controlar tamaño desde el padre (ej. w-28 h-20) */
   className?: string;
+  /** Indica si el contenedor está visible (ej. tab activo) para invalidar tamaño */
+  isVisible?: boolean;
 }
 
 export default function RealMap({
@@ -31,7 +33,8 @@ export default function RealMap({
   interactive = false,
   userLocation,
   variant = 'full',
-  className
+  className,
+  isVisible = true,
 }: RealMapProps) {
   const mapRef = useRef<any>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -41,6 +44,7 @@ export default function RealMap({
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const resizeObsRef = useRef<ResizeObserver | null>(null);
+  const visibilityObsRef = useRef<IntersectionObserver | null>(null);
 
   // Load Leaflet CSS and JS
   useEffect(() => {
@@ -140,12 +144,44 @@ export default function RealMap({
         resizeObsRef.current?.disconnect();
         map.remove();
         mapRef.current = null;
+        visibilityObsRef.current?.disconnect();
+        visibilityObsRef.current = null;
       };
     } catch (error) {
       console.error('Error initializing map:', error);
       setLoadError(true);
     }
   }, [isLoading, loadError, interactive, onLocationSelect, userLocation, variant]);
+
+  // Recalcular tamaño cuando el contenedor vuelve a ser visible (p.ej. al cambiar de tab)
+  useEffect(() => {
+    if (!mapRef.current || !mapContainerRef.current || typeof IntersectionObserver === 'undefined') {
+      return;
+    }
+
+    visibilityObsRef.current?.disconnect();
+    visibilityObsRef.current = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          requestAnimationFrame(() => mapRef.current?.invalidateSize());
+        }
+      });
+    });
+
+    visibilityObsRef.current.observe(mapContainerRef.current);
+
+    return () => {
+      visibilityObsRef.current?.disconnect();
+      visibilityObsRef.current = null;
+    };
+  }, []);
+
+  // Invalidar tamaño cuando el contenedor vuelve a ser visible (p.ej. cambio de tab)
+  useEffect(() => {
+    if (isVisible && mapRef.current) {
+      requestAnimationFrame(() => mapRef.current?.invalidateSize());
+    }
+  }, [isVisible]);
 
   // Update user location marker
   useEffect(() => {

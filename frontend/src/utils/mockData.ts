@@ -27,7 +27,7 @@ export const mockLogin = (email: string, password: string): User | null => {
 // Get current user from localStorage
 export const getCurrentUser = (): User | null => {
   try {
-    const stored = localStorage.getItem('currentUser');
+    const stored = sessionStorage.getItem('currentUser');
     if (stored) {
       return JSON.parse(stored);
     }
@@ -37,13 +37,13 @@ export const getCurrentUser = (): User | null => {
   return null;
 };
 
-// Save current user to localStorage
+// Save current user to sessionStorage
 export const saveCurrentUser = (user: User | null): void => {
   try {
     if (user) {
-      localStorage.setItem('currentUser', JSON.stringify(user));
+      sessionStorage.setItem('currentUser', JSON.stringify(user));
     } else {
-      localStorage.removeItem('currentUser');
+      sessionStorage.removeItem('currentUser');
     }
   } catch (e) {
     console.error('Error saving user:', e);

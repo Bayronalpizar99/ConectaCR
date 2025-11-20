@@ -1,16 +1,24 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { AlertCircle, CheckCircle2, Clock, LogOut, MapPin, Filter, BarChart3 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, LogOut, MapPin, Filter, BarChart3, UserCircle } from 'lucide-react';
 import { User, Report, ReportStatus, ReportCategory, CATEGORY_LABELS, STATUS_LABELS } from '../types';
 import RealMap from './RealMap';
 import ReportDetailsDialog from './ReportDetailsDialog';
 import ThemeToggle from './ThemeToggle';
 import { useGeolocation } from '../hooks/useGeolocation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 
 interface AdminDashboardProps {
   user: User;
@@ -28,6 +36,10 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
   const geolocation = useGeolocation();
   const userLocation = geolocation.latitude && geolocation.longitude ? { lat: geolocation.latitude, lng: geolocation.longitude } : null;
   const [statusFilter, setStatusFilter] = useState<ReportStatus | 'all'>('all');
+  const [activeTab, setActiveTab] = useState<'overview' | 'reports' | 'map' | 'stats'>('overview');
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const hoverTimeoutRef = useRef<number | null>(null);
+
 
   const filteredReports = reports.filter(report => {
     if (categoryFilter !== 'all' && report.category !== categoryFilter) return false;
@@ -61,6 +73,18 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
     count: reports.filter(r => r.category === cat).length
   })).sort((a, b) => b.count - a.count);
 
+  const handleProfileMouseEnter = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    setProfileMenuOpen(true);
+  };
+
+  const handleProfileMouseLeave = () => {
+    hoverTimeoutRef.current = window.setTimeout(() => {
+      setProfileMenuOpen(false);
+    }, 200);
+  };
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -77,14 +101,43 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="text-right">
-                <p className="text-foreground">{user.name}</p>
-                <p className="text-muted-foreground">{user.email}</p>
-              </div>
               <ThemeToggle theme={theme} onToggle={onToggleTheme} />
-              <Button variant="outline" size="icon" onClick={onLogout}>
-                <LogOut className="w-4 h-4" />
-              </Button>
+              <DropdownMenu open={profileMenuOpen} onOpenChange={setProfileMenuOpen}>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="p-0 h-10 w-10 rounded-full border border-border hover:bg-muted inline-flex items-center justify-center bg-background text-foreground"
+                    aria-label="Perfil"
+                    onMouseEnter={handleProfileMouseEnter}
+                    onMouseLeave={handleProfileMouseLeave}
+                  >
+                    <UserCircle className="w-8 h-8 text-primary" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  align="end" 
+                  className="w-64"
+                  onMouseEnter={handleProfileMouseEnter}
+                  onMouseLeave={handleProfileMouseLeave}
+                >
+                  <DropdownMenuLabel>
+                    <p className="font-semibold">{user.name}</p>
+                    <p className="text-xs text-muted-foreground break-words">{user.email}</p>
+                    <p className="text-xs text-muted-foreground capitalize mt-1">Rol: {user.role}</p>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-destructive focus:text-destructive"
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      onLogout();
+                    }}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Cerrar sesión
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
@@ -133,7 +186,13 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
         </div>
 
         {/* Main Tabs */}
-        <Tabs defaultValue="overview" className="space-y-4">
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) =>
+            setActiveTab(value as 'overview' | 'reports' | 'map' | 'stats')
+          }
+          className="space-y-4"
+        >
           <TabsList>
             <TabsTrigger value="overview">Vista General</TabsTrigger>
             <TabsTrigger value="reports">Gestión de Reportes</TabsTrigger>
@@ -326,8 +385,13 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
             </Card>
           </TabsContent>
 
-          <TabsContent value="map" className="space-y-4">
-            <Card>
+          <TabsContent
+            value="map"
+            className="space-y-4"
+            forceMount
+            style={{ display: activeTab === 'map' ? 'block' : 'none' }}
+          >
+            <Card style={{ display: activeTab === 'map' ? 'block' : 'none' }}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
@@ -361,6 +425,7 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
                     onReportClick={handleReportClick}
                     interactive={true}
                     userLocation={userLocation}
+                    isVisible={activeTab === 'map'}
                   />
                   </div>
                 <div className="flex items-center gap-4 mt-4">

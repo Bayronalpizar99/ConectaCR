@@ -48,21 +48,29 @@ export class ReportAdapter implements ReportRepository {
   }
 
   async updateStatus(id: string, status: Report['status']): Promise<Report> {
-    const { data, error } = await this.supabase
+    const { error } = await this.supabase
       .from('reports')
       .update({
         status,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', id)
-      .select()
-      .single();
+      .eq('id', id);
 
     if (error) {
       throw new Error(`Error updating report status in Supabase: ${error.message}`);
     }
 
-    return this.mapToDomain(data);
+    const { data: updatedRow, error: fetchError } = await this.supabase
+      .from('reports')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (fetchError) {
+      throw new Error(`Report with id ${id} not found after update: ${fetchError.message}`);
+    }
+
+    return this.mapToDomain(updatedRow);
   }
 
   private mapToDomain(row: any): Report {
