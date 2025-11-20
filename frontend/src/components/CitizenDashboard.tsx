@@ -40,7 +40,11 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
   const [categoryFilter, setCategoryFilter] = useState<ReportCategory | 'all'>('all');
   const [activeTab, setActiveTab] = useState<'map' | 'my-reports' | 'all-reports'>('map');
   const geolocation = useGeolocation();
-  const userLocation = geolocation.latitude && geolocation.longitude ? { lat: geolocation.latitude, lng: geolocation.longitude } : null;
+  const userLocation = useMemo(() => {
+    return geolocation.latitude && geolocation.longitude
+      ? { lat: geolocation.latitude, lng: geolocation.longitude }
+      : null;
+  }, [geolocation.latitude, geolocation.longitude]);
 
   const filteredReports = useMemo(() => {
     return categoryFilter === 'all' ? reports : reports.filter(r => r.category === categoryFilter);

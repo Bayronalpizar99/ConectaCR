@@ -300,15 +300,16 @@ html {
 
 /* Logo Popover - Global Solution */
 .logo-popover {
-  height: 155px;
+  height: 150px;
   width: auto;
   max-width: 200px;
   object-fit: contain;
   position: absolute;
-  top: -40px;
+  top: -35px;
   left: 1rem; /* Aligns with container padding */
   z-index: 50;
   transition: all 0.3s ease;
+  pointer-events: none;
 }
 
 /* Ensure header allows overflow */

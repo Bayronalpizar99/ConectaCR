@@ -38,7 +38,11 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<ReportCategory | 'all'>('all');
   const geolocation = useGeolocation();
-  const userLocation = geolocation.latitude && geolocation.longitude ? { lat: geolocation.latitude, lng: geolocation.longitude } : null;
+  const userLocation = useMemo(() => {
+    return geolocation.latitude && geolocation.longitude
+      ? { lat: geolocation.latitude, lng: geolocation.longitude }
+      : null;
+  }, [geolocation.latitude, geolocation.longitude]);
   const [statusFilter, setStatusFilter] = useState<ReportStatus | 'all'>('all');
   const [activeTab, setActiveTab] = useState<'overview' | 'reports' | 'map' | 'stats'>('overview');
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
