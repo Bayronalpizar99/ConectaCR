@@ -5,9 +5,10 @@ import { CreateReportService } from '../application/create-report.service';
 import { GetReportsService } from '../application/get-reports.service';
 import { UpdateReportStatusService } from '../application/update-report-status.service';
 import { ReportAdapter } from './driven-adapters/supabase/report.adapter';
+import { NotificationModule } from './notification.module';
 
 @Module({
-  imports: [SupabaseModule],
+  imports: [SupabaseModule, NotificationModule],
   controllers: [ReportController],
   providers: [
     {

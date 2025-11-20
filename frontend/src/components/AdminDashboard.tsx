@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { AlertCircle, CheckCircle2, Clock, LogOut, Filter, BarChart3, UserCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, LogOut, Filter, BarChart3, UserCircle, Bell } from 'lucide-react';
 import { User, Report, ReportStatus, ReportCategory, CATEGORY_LABELS, STATUS_LABELS } from '../types';
 import RealMap from './RealMap';
 import ReportDetailsDialog from './ReportDetailsDialog';
@@ -173,6 +173,9 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
 
           <div className="flex items-center gap-2">
             <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+            <Button variant="outline" size="icon" className="relative" aria-label="Notificaciones">
+              <Bell className="h-[1.2rem] w-[1.2rem]" />
+            </Button>
             <DropdownMenu open={profileMenuOpen} onOpenChange={setProfileMenuOpen} modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ReportModule } from './infrastructure/report.module';
 import { AuthModule } from './infrastructure/auth/auth.module';
+import { NotificationModule } from './infrastructure/notification.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { AuthModule } from './infrastructure/auth/auth.module';
     }),
     ReportModule,
     AuthModule,
+    NotificationModule,
   ],
   controllers: [],
   providers: [],

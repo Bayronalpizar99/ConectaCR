@@ -3,11 +3,12 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
-import { Plus, MapPin, List, LogOut, Filter, UserCircle } from 'lucide-react';
+import { Plus, MapPin, List, LogOut, Filter, UserCircle, Bell } from 'lucide-react';
 import { User, Report, CATEGORY_LABELS, STATUS_LABELS, ReportCategory } from '../types';
 import RealMap from './RealMap';
 import CreateReportDialog from './CreateReportDialog';
 import ReportDetailsDialog from './ReportDetailsDialog';
+import NotificationsPopover from './NotificationsPopover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import ThemeToggle from './ThemeToggle';
 import { useGeolocation } from '../hooks/useGeolocation';
@@ -158,6 +159,7 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
 
           <div className="flex items-center gap-2">
             <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+            <NotificationsPopover userId={user.id} />
             <DropdownMenu open={profileMenuOpen} onOpenChange={setProfileMenuOpen} modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button

@@ -59,3 +59,13 @@ export const STATUS_LABELS: Record<ReportStatus, string> = {
   en_progreso: 'En Progreso',
   resuelto: 'Resuelto'
 };
+
+export interface Notification {
+  id: string;
+  userId: string;
+  reportId: string;
+  title: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+}

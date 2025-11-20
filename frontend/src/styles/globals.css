@@ -305,7 +305,7 @@ html {
   max-width: 200px;
   object-fit: contain;
   position: absolute;
-  top: -35px;
+  top: -36px;
   left: 1rem; /* Aligns with container padding */
   z-index: 50;
   transition: all 0.3s ease;
