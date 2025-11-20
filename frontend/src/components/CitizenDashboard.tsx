@@ -163,7 +163,7 @@ export default function CitizenDashboard({ user, reports, onCreateReport, onLogo
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                   >
-                    <UserCircle className="h-[1.2rem] w-[1.2rem] text-primary" />
+                    <UserCircle className="h-[1.2rem] w-[1.2rem]" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent 

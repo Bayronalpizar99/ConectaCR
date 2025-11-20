@@ -178,7 +178,7 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
                     onMouseEnter={handleProfileMouseEnter}
                     onMouseLeave={handleProfileMouseLeave}
                   >
-                    <UserCircle className="h-[1.2rem] w-[1.2rem] text-primary" />
+                    <UserCircle className="h-[1.2rem] w-[1.2rem]" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent 
