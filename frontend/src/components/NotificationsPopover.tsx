@@ -17,9 +17,10 @@ import { cn } from './ui/utils';
 
 interface NotificationsPopoverProps {
   userId: string;
+  onNotificationClick?: (notification: Notification) => void;
 }
 
-export default function NotificationsPopover({ userId }: NotificationsPopoverProps) {
+export default function NotificationsPopover({ userId, onNotificationClick }: NotificationsPopoverProps) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -110,6 +111,10 @@ export default function NotificationsPopover({ userId }: NotificationsPopoverPro
                   onSelect={(e) => {
                     e.preventDefault();
                     handleMarkAsRead(notification);
+                    if (onNotificationClick) {
+                      onNotificationClick(notification);
+                      setIsOpen(false);
+                    }
                   }}
                 >
                   <div className="flex w-full items-start justify-between gap-2">

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo } from 'react';
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -49,7 +49,16 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
   const [activeTab, setActiveTab] = useState<'overview' | 'reports' | 'map' | 'stats'>('overview');
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const hoverTimeoutRef = useRef<number | null>(null);
+  const [focusedReportId, setFocusedReportId] = useState<string | null>(null);
+  const [focusTrigger, setFocusTrigger] = useState(0);
 
+  // Limpiar el foco del reporte cuando se cambia de pestaña
+  // Esto asegura que al volver al mapa manualmente, no se vuelva a centrar/abrir el último reporte notificado
+  useEffect(() => {
+    if (activeTab !== 'map') {
+      setFocusedReportId(null);
+    }
+  }, [activeTab]);
 
   const filteredReports = useMemo(() => {
     return reports.filter(report => {
@@ -98,6 +107,18 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
     }, 200);
   };
 
+  const handleNotificationClick = (notification: any) => {
+    if (notification.reportId) {
+      // Limpiar filtros para asegurar que el reporte sea visible en el mapa
+      setCategoryFilter('all');
+      setStatusFilter('all');
+      
+      setActiveTab('map');
+      setFocusedReportId(notification.reportId);
+      setFocusTrigger(prev => prev + 1);
+    }
+  };
+
   const mapTabContent = useMemo(
     () => (
       <TabsContent
@@ -139,6 +160,8 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
                 interactive={true}
                 userLocation={userLocation}
                 isVisible={activeTab === 'map'}
+                focusedReportId={focusedReportId}
+                focusTrigger={focusTrigger}
               />
             </div>
             <div className="flex items-center gap-4 mt-4">
@@ -159,7 +182,7 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
         </Card>
       </TabsContent>
     ),
-    [activeTab, categoryFilter, filteredReports, handleReportClick, userLocation, recibidos, enProgreso, resueltos],
+    [activeTab, categoryFilter, filteredReports, handleReportClick, userLocation, recibidos, enProgreso, resueltos, focusedReportId, focusTrigger],
   );
   return (
     <div className="min-h-screen bg-background">
@@ -175,7 +198,7 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
 
           <div className="flex items-center gap-2">
             <ThemeToggle theme={theme} onToggle={onToggleTheme} />
-            <NotificationsPopover userId={user.id} />
+            <NotificationsPopover userId={user.id} onNotificationClick={handleNotificationClick} />
             <DropdownMenu open={profileMenuOpen} onOpenChange={setProfileMenuOpen} modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button

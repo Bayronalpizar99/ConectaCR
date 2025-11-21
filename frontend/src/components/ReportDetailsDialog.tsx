@@ -12,13 +12,12 @@ interface ReportDetailsDialogProps {
 }
 
 export default function ReportDetailsDialog({ report, open, onOpenChange }: ReportDetailsDialogProps) {
-  if (!report) return null;
-
   const [imgSrc, setImgSrc] = useState<string | null>(null);
   const revokeRef = useRef<string | null>(null);
 
   // Deriva una fuente persistente si existe
   const persistedSrc = useMemo(() => {
+    if (!report) return null;
     const anyReport = report as any;
     if (typeof anyReport?.imageDataUrl === 'string' && anyReport.imageDataUrl.length > 0) return anyReport.imageDataUrl;
     if (typeof anyReport?.imageUrl === 'string' && anyReport.imageUrl.length > 0) return anyReport.imageUrl;
@@ -26,6 +25,8 @@ export default function ReportDetailsDialog({ report, open, onOpenChange }: Repo
   }, [report]);
 
   useEffect(() => {
+    if (!report) return;
+
     // Limpia cualquier blob anterior
     if (revokeRef.current && revokeRef.current.startsWith('blob:')) {
       try { URL.revokeObjectURL(revokeRef.current); } catch {}
@@ -68,6 +69,8 @@ export default function ReportDetailsDialog({ report, open, onOpenChange }: Repo
     };
   // Recalcula sólo al cambiar de reporte (o su fuente persistida)
   }, [report, persistedSrc]);
+
+  if (!report) return null;
 
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString('es-ES', {

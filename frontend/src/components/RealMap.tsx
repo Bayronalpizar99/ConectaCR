@@ -23,10 +23,14 @@ interface RealMapProps {
   className?: string;
   /** Indica si el contenedor está visible (ej. tab activo) para invalidar tamaño */
   isVisible?: boolean;
+  /** ID del reporte en el que se debe centrar el mapa */
+  focusedReportId?: string | null;
+  /** Trigger para forzar el reenfoque incluso si el ID es el mismo */
+  focusTrigger?: number;
 }
 
 export default function RealMap({
-  reports,
+  reports = [],
   onLocationSelect,
   selectedLocation,
   onReportClick,
@@ -35,12 +39,24 @@ export default function RealMap({
   variant = 'full',
   className,
   isVisible = true,
+  focusedReportId,
+  focusTrigger = 0,
 }: RealMapProps) {
   const mapRef = useRef<any>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const markersRef = useRef<any[]>([]);
   const selectedMarkerRef = useRef<any>(null);
   const userMarkerRef = useRef<any>(null);
+  // Guardamos una referencia a los marcadores por ID para acceso rápido
+  const markersMapRef = useRef<Map<string, any>>(new Map());
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const resizeObsRef = useRef<ResizeObserver | null>(null);
@@ -270,6 +286,7 @@ export default function RealMap({
       mapRef.current.removeLayer(marker);
     });
     markersRef.current = [];
+    markersMapRef.current.clear();
 
     reports.forEach((report) => {
       const getMarkerColor = (status: string) => {
@@ -330,13 +347,68 @@ export default function RealMap({
       }
 
       markersRef.current.push(marker);
+      markersMapRef.current.set(report.id, marker);
     });
 
-    if (reports.length > 0 && !selectedLocation && !userLocation && variant === 'full') {
+    if (reports.length > 0 && !selectedLocation && !userLocation && variant === 'full' && !focusedReportId) {
       const group = window.L.featureGroup(markersRef.current);
       mapRef.current.fitBounds(group.getBounds().pad(0.1));
     }
-  }, [reports, onReportClick, selectedLocation, userLocation, variant]);
+  }, [reports, onReportClick, selectedLocation, userLocation, variant]); // Removed focusedReportId from dependency to avoid re-rendering markers just for focus
+
+  // Effect to handle focusing on a specific report
+  useEffect(() => {
+    if (!mapRef.current || !focusedReportId || !isVisible) return;
+
+    // Pequeño delay para asegurar que el mapa tenga tamaño correcto (especialmente al cambiar de tabs)
+    const timer = setTimeout(() => {
+      if (!isMountedRef.current || !mapRef.current) return;
+
+      // Asegurar que el mapa sepa su tamaño actual antes de animar
+      mapRef.current.invalidateSize();
+
+      const marker = markersMapRef.current.get(focusedReportId);
+      if (marker) {
+        try {
+          const latLng = marker.getLatLng();
+          
+          // Validar coordenadas antes de volar
+          if (!latLng || typeof latLng.lat !== 'number' || typeof latLng.lng !== 'number' || isNaN(latLng.lat) || isNaN(latLng.lng)) {
+             console.warn('Coordenadas inválidas para el reporte:', focusedReportId);
+             return;
+          }
+
+          mapRef.current.flyTo(latLng, 16, {
+            animate: true,
+            duration: 1.5
+          });
+          
+          // Abrir el popup después de que termine la animación
+          setTimeout(() => {
+            if (!isMountedRef.current) return;
+            
+            try {
+              marker.openPopup();
+              if (onReportClick && reports) {
+                 const report = reports.find(r => r.id === focusedReportId);
+                 if (report) {
+                   onReportClick(report);
+                 }
+              }
+            } catch (err) {
+              console.error('Error opening popup or handling click:', err);
+            }
+          }, 1500);
+        } catch (error) {
+          console.error('Error focusing on report:', error);
+        }
+      } else {
+        console.warn('Marcador no encontrado para el reporte:', focusedReportId);
+      }
+    }, 100); // 100ms de espera para asegurar renderizado
+
+    return () => clearTimeout(timer);
+  }, [focusedReportId, isVisible, reports, onReportClick, focusTrigger]);
 
   if (loadError) {
     return (
