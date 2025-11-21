@@ -20,6 +20,8 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 
+import NotificationsPopover from './NotificationsPopover';
+
 // Importación de logos
 import logoLight from '../assets/logo1.png';
 import logoDark from '../assets/logo2.png';
@@ -173,9 +175,7 @@ export default function AdminDashboard({ user, reports, onUpdateStatus, onLogout
 
           <div className="flex items-center gap-2">
             <ThemeToggle theme={theme} onToggle={onToggleTheme} />
-            <Button variant="outline" size="icon" className="relative" aria-label="Notificaciones">
-              <Bell className="h-[1.2rem] w-[1.2rem]" />
-            </Button>
+            <NotificationsPopover userId={user.id} />
             <DropdownMenu open={profileMenuOpen} onOpenChange={setProfileMenuOpen} modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button

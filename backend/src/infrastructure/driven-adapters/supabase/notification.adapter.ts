@@ -56,6 +56,31 @@ export class NotificationAdapter implements NotificationRepository {
     }
   }
 
+  async findAdmins(): Promise<string[]> {
+    console.log('Finding admins...');
+    // Nota: Esto requiere que el cliente Supabase se haya inicializado con la SERVICE_ROLE_KEY
+    const { data: { users }, error } = await this.supabase.auth.admin.listUsers({
+      perPage: 1000 // Intentamos traer todos los usuarios posibles
+    });
+    
+    if (error) {
+      console.error('Error fetching admins:', error);
+      return [];
+    }
+
+    console.log(`Found ${users.length} users total.`);
+    const admins = (users || [])
+      .filter((user: any) => {
+        const isAdmin = user.user_metadata?.role === 'admin';
+        console.log(`User ${user.id} role: ${user.user_metadata?.role} -> Is Admin? ${isAdmin}`);
+        return isAdmin;
+      })
+      .map((user: any) => user.id);
+      
+    console.log(`Found ${admins.length} admins:`, admins);
+    return admins;
+  }
+
   private mapToDomain(row: any): Notification {
     return {
       id: row.id,

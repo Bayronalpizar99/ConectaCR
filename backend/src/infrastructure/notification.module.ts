@@ -14,6 +14,6 @@ import { SupabaseModule } from './supabase/supabase.module';
       useClass: NotificationAdapter,
     },
   ],
-  exports: ['NotificationRepository'],
+  exports: ['NotificationRepository', NotificationService],
 })
 export class NotificationModule {}
