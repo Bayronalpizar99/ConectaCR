@@ -17,7 +17,13 @@ import { SupabaseStorageService } from './supabase-storage.service';
           throw new Error('Supabase URL or Key not found in environment variables');
         }
 
-        return createClient(supabaseUrl, supabaseKey);
+        return createClient(supabaseUrl, supabaseKey, {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false,
+          },
+        });
       },
       inject: [ConfigService],
     },
