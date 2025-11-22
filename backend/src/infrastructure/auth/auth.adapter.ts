@@ -1,5 +1,6 @@
 import { Inject, Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseClient, createClient } from '@supabase/supabase-js';
+import { ConfigService } from '@nestjs/config';
 import { AuthRepository } from '../../application/ports/out/auth.repository';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
@@ -7,11 +8,28 @@ import { LoginAuthDto } from './dto/login-auth.dto';
 @Injectable()
 export class AuthAdapter implements AuthRepository {
   constructor(
-    @Inject('Supabase') private readonly supabase: SupabaseClient
+    @Inject('Supabase') private readonly supabase: SupabaseClient,
+    private readonly configService: ConfigService
   ) {}
 
+  private getAuthClient() {
+    return createClient(
+      this.configService.get<string>('SUPABASE_URL') ?? '',
+      this.configService.get<string>('SUPABASE_SERVICE_ROLE_KEY') ?? 
+      this.configService.get<string>('SUPABASE_KEY') ?? '',
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+        },
+      }
+    );
+  }
+
   async register(registerDto: RegisterAuthDto): Promise<any> {
-    const { data, error } = await this.supabase.auth.signUp({
+    const authClient = this.getAuthClient();
+    const { data, error } = await authClient.auth.signUp({
       email: registerDto.email,
       password: registerDto.password,
       options: {
@@ -33,7 +51,8 @@ export class AuthAdapter implements AuthRepository {
   }
 
   async login(loginDto: LoginAuthDto): Promise<any> {
-    const { data, error } = await this.supabase.auth.signInWithPassword({
+    const authClient = this.getAuthClient();
+    const { data, error } = await authClient.auth.signInWithPassword({
       email: loginDto.email,
       password: loginDto.password,
     });
